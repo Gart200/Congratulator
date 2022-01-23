@@ -3,6 +3,7 @@ package com.company;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -22,7 +23,7 @@ public class BirthdayList {
     }
 
     void printAllRecords() {
-        System.out.printf("%s%8s%15s%20s", "ID", "Имя", "Фамилия", "Дата рождения\n");
+        System.out.printf("%s%10s%14s%20s", "ID", "Имя", "Фамилия", "Дата рождения\n");
         for (Birthday bd : birthdays) {
             printRecord(bd);
         }
@@ -33,15 +34,21 @@ public class BirthdayList {
     void printTodayAndNearRecords() {
         LocalDate currentDate = LocalDate.now();
 
-        System.out.printf("%s%8s%15s%20s", "ID", "Имя", "Фамилия", "Дата рождения\n");
+        System.out.printf("%s%10s%14s%20s", "ID", "Имя", "Фамилия", "Дата рождения\n");
         for (Birthday bd : birthdays) {
 
             LocalDate ld = LocalDate.of(LocalDate.now().getYear(), bd.getDateOfBirth().getMonthValue(), bd.getDateOfBirth().getDayOfMonth());
 
-            //День рождения в этом году уже прошёл, расчёт для следующего года
-            if (ld.isBefore(currentDate)) {
-                if (Period.between(ld.plusYears(1), currentDate).getDays() <= 14 )
+            //День рождения в этому году
+            if (ld.isAfter(currentDate)){
+                if (ChronoUnit.DAYS.between(currentDate,ld) <= 14 )
                     printRecord(bd);
+            }
+            //День рождения в этом году уже прошёл, расчёт для следующего года
+            else if (ld.isBefore(currentDate)) {
+                if (ChronoUnit.DAYS.between(currentDate,ld.plusYears(1)) <= 14 )
+                    printRecord(bd);
+
             }
             //День рождения сегодня
             else if (ld.isEqual(currentDate))
@@ -131,6 +138,6 @@ public class BirthdayList {
     }
 
     void printRecord(Birthday bd) {
-        System.out.printf("%s%10s%14s%18s\n", bd.getId(), bd.getName(), bd.getSurname(), dateFormat.format(bd.getDateOfBirth()));
+        System.out.printf("%2s%10s%14s%19s\n", bd.getId(), bd.getName(), bd.getSurname(), dateFormat.format(bd.getDateOfBirth()));
     }
 }
